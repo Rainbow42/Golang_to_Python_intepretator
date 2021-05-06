@@ -7,7 +7,7 @@ class Parsing:
                 'package', 'case', 'defer', 'go', 'map', 'struct', 'main',
                 'chan', 'else', 'goto', 'package', 'switch',
                 'const', 'fallthrough', 'if', 'range', 'type',
-                'continue', 'for', 'import', 'return', 'var', ',')
+                'continue', 'for', 'import', 'return', 'var', ';')
 
     def parsing_lexeme(self, code):
         lexeme = LexicalDictionary()
@@ -113,6 +113,9 @@ class Parsing:
                     # Знак сложения
                     lexeme.add("".join(word))
 
+                if word := re.findall(r';', key):
+                    lexeme.keywords("".join(word))
+
             if lex := lexeme.get_lexical():
                 table.append_table(lex.copy())
                 lexeme.clear_lexical()
@@ -133,6 +136,9 @@ class LexicalDictionary:
 
     def keywords(self, key: str):
         self.table_word.append({'KEYWORDS': key})
+
+    def var_init(self, key: str):
+        self.table_word.append({'VAR_INIT': key})
 
     def variable(self, key: str):
         self.table_word.append({'VAR': key})
