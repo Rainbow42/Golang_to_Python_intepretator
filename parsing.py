@@ -24,16 +24,20 @@ class Parsing:
                     lexeme.decimal("".join(word))
                     continue
 
+                if key[0] == '"' and key[-1] == '"':
+                    lexeme.string(key)
+                    continue
+
                 if word := re.findall(r'[-+]?[0-9]+', key):
                     # целое число
                     lexeme.integer("".join(word))
 
                 if word := re.findall(r'^}$', key):
-                    # закрывающая фигруная скобка
+                    # закрывающая фигурная скобка
                     lexeme.closing_curly_brace("".join(word))
 
                 if word := re.findall(r'{', key):
-                    # открывающая фигруная скобка
+                    # открывающая фигурная скобка
                     lexeme.open_curly_brace("".join(word))
 
                 if word := re.findall(r'\)', key):
@@ -104,10 +108,9 @@ class Parsing:
                 if word := re.findall(r'-', key):
                     # Знак вычитания
                     idx = key.index('-')
-                    if idx >= 0:
-                        if idx < len(key):
-                            continue
-                    lexeme.subtraction("".join(word))
+                    if idx == 0:
+                        if idx+1 == len(key):
+                            lexeme.subtraction("".join(word))
 
                 if word := re.findall(r'\+', key):
                     # Знак сложения
@@ -148,6 +151,9 @@ class LexicalDictionary:
 
     def integer(self, key: str):
         self.table_word.append({'INT': key})
+
+    def string(self, key: str):
+        self.table_word.append({'STR': key})
 
     def closing_curly_brace(self, key: str):
         self.table_word.append({'CCB': key})
