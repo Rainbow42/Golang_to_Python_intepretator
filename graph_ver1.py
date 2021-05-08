@@ -145,11 +145,10 @@ class Graph:
         self.stmt()
 
     def mathematic(self):
-        forvard = None
         if self.j >= self.m - 1:
             return
         token = self.next_token()
-        # print(token)
+
         if token.get('ADD') or token.get('MULT') \
                 or token.get("SUB") or token.get("DIV"):
             number_title = list(self.tops[-1].keys())[0]
