@@ -180,5 +180,3 @@ class Graph:
         else:
             raise ValueError("Ожидалась переменная или матем. операнд")
         self.mathematic()
-        """if token.get('OB') or token.get('ADD') or token.get('MULT') \
-                or token.get("SUB") or token.get("DIV"):"""
