@@ -5,8 +5,8 @@ import re
 class Parsing:
     keywords = ('break', 'default', 'func', 'interface', 'select', 'main()',
                 'package', 'case', 'defer', 'go', 'map', 'struct', 'main',
-                'chan', 'else', 'goto', 'package', 'switch',
-                'const', 'fallthrough', 'if', 'range', 'type',
+                'chan', 'goto', 'package', 'switch',
+                'const', 'fallthrough', 'range', 'type',
                 'continue', 'for', 'import', 'return', 'var', ';')
 
     def parsing_lexeme(self, code):
@@ -22,6 +22,14 @@ class Parsing:
                         r'[-+]?[0-9]*[.,][0-9]+(?:[eE][-+]?[0-9]+)*', key):
                     # число с плавающей запятой
                     lexeme.decimal("".join(word))
+                    continue
+
+                if key == "if":
+                    lexeme.condition(key)
+                    continue
+
+                if word := re.findall(r'else$', key):
+                    lexeme.other("".join(word))
                     continue
 
                 if key[0] == '"' and key[-1] == '"':
@@ -116,6 +124,10 @@ class Parsing:
                     # Знак сложения
                     lexeme.add("".join(word))
 
+                if word := re.findall(r'!=', key):
+                    # Знак сложения
+                    lexeme.not_equal("".join(word))
+
                 if word := re.findall(r';', key):
                     lexeme.keywords("".join(word))
 
@@ -161,6 +173,12 @@ class LexicalDictionary:
     def open_curly_brace(self, key: str):
         self.table_word.append({'OCB': key})
 
+    def other(self, key: str):
+        self.table_word.append({'ELSE': key})
+
+    def condition(self, key: str):
+        self.table_word.append({'IF': key})
+
     def closing_brace(self, key: str):
         self.table_word.append({'CB': key})
 
@@ -178,6 +196,9 @@ class LexicalDictionary:
 
     def assignment_mark(self, key: str):
         self.table_word.append({'AM': key})
+
+    def not_equal(self, key: str):
+        self.table_word.append({'NOTE': key})
 
     def equality(self, key: str):
         self.table_word.append({'Equality': key})

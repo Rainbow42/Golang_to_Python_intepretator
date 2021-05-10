@@ -3,7 +3,7 @@ package main
 func main() {
     sum = 505.55
     a =  -12
-    i := -1 // присваивание
+    i := -1
     answer = ( 12 + 3 - 9 * 6 ) / 7 //
      if i == 0 {
     }
@@ -13,10 +13,10 @@ func main() {
         i = i - 1
     }
 
-    for j := 7; j <= 9; j++ {
+    for j := 7; j != 9; j++ {
       sum = sum + 1
     }
-    if < 0 {
+    if > 0 {
         break
     }
 }

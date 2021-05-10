@@ -1,70 +1,18 @@
-{'VAR': 'sum'}
-{'AM': '='}
-{'FLOAT': '505.55'}
-{'VAR': 'a'}
-{'AM': '='}
-{'INT': '-12'}
-{'VAR': 'i'}
-{'AM': ':='}
-{'INT': '-1'}
-{'comment': '//'}
-{'VAR': 'answer'}
-{'AM': '='}
-{'OB': '('}
-{'INT': '12'}
-{'ADD': '+'}
-{'INT': '3'}
-{'ADD': '+'}
-{'INT': '9'}
-{'MULT': '*'}
-{'INT': '6'}
-{'CB': ')'}
-{'MULT': '*'}
-{'INT': '7'}
-{'comment': '//'}
-{'KEYWORDS': 'if'}
-{'VAR': 'i'}
-{'Equality': '=='}
-{'INT': '0'}
-{'OCB': '{'}
-{'CCB': '}'}
-{'KEYWORDS': 'else'}
-{'OCB': '{'}
-{'CCB': '}'}
-{'KEYWORDS': 'for'}
-{'VAR': 'i'}
-{'MQ': '>='}
-{'INT': '3'}
-{'OCB': '{'}
-{'VAR': 'i'}
-{'AM': '='}
-{'VAR': 'i'}
-{'INT': '1'}
-{'CCB': '}'}
-{'KEYWORDS': 'for'}
-{'VAR': 'j'}
-{'AM': ':='}
-{'INT': '7'}
-{'KEYWORDS': ';'}
-{'VAR': 'j'}
-{'LQ': '<='}
-{'INT': '9'}
-{'KEYWORDS': ';'}
-{'VAR': 'j'}
-{'ADD': '++'}
-{'OCB': '{'}
-{'VAR': 'sum'}
-{'AM': '='}
-{'VAR': 'sum'}
-{'ADD': '+'}
-{'INT': '1'}
-{'CCB': '}'}
-{'KEYWORDS': 'if'}
-{'LESS': '<'}
-{'INT': '0'}
-{'OCB': '{'}
-{'KEYWORDS': 'break'}
-{'CCB': '}'}
-{'CCB': '}'}
-
-Process finished with exit code 0
+{1: [{2: {'AM': ':='}}],
+ 2: [{'INT': '60'}],
+ 3: [{4: {'VAR': 'grade'}}, {6: 'cont'}],
+ 4: [{5: {'MQ': '>='}}],
+ 5: [{'INT': '65'}],
+ 6: [{'OCB': '{'}, {7: {'VAR': 'result'}}, {9: {'IF': 'if'}}],
+ 7: [{8: {'AM': '='}}],
+ 8: [{'INT': '0'}],
+ 9: [{10: {'VAR': 'grade'}}, {12: 'cont'}],
+ 10: [{11: {'Equality': '=='}}],
+ 11: [{'INT': '70'}],
+ 12: [{13: {'CCB': '}'}}, {14: {'ELSE': 'else'}}],
+ 13: [],
+ 14: [{15: 'cont'}],
+ 15: [{'OCB': '{'}, {'CCB': '}'}, {'CCB': '}'}],
+ 16: [{17: {'AM': '='}}],
+ 17: [{'INT': '55'}],
+ 'stmt': [{1: {'VAR': 'grade'}}, {3: {'IF': 'if'}}, {16: {'VAR': 'result'}}]}

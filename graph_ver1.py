@@ -32,7 +32,8 @@ class Graph:
     numbers_title = 0  # уникальное число для хранения в графе
     open_brackets = list()  # для отслеживания открытых скобок
     close_brackets = list()  # для отслеживания закрытых скобок
-    braces = list()  # для отслеживания закрытых фигурных скобок
+    open_braces = list()  # для отслеживания открытых фигурных скобок
+    close_braces = list()  # для отслеживания закрытых фигурных скобок
 
     # наименования выражения
 
@@ -44,8 +45,10 @@ class Graph:
 
     def next_token(self):
         self.j += 1
-        # print(self.j)
         return self.line_token[self.j]
+
+    def before_token(self):
+        return self.line_token[self.j - 1]
 
     def add_in_graph_title_gram(self, title, number_title=None, list_=False):
         # title = наименование грамматики
@@ -86,6 +89,22 @@ class Graph:
     def get_abstract_syntax_trees(self):
         return self.stmt()
 
+    def get_number_title(self):
+        number_title = None
+
+        for val in self.open_braces:  # для слежения за вложенностью
+            val = list(val.keys())[0]
+            for val2 in self.close_braces:
+                if val2:
+                    val2 = list(val2.keys())[0]
+                    if val != val2:
+                        number_title = val
+                else:
+                    number_title = val
+            else:
+                number_title = val
+        return number_title
+
     def stmt(self):
         if self.i >= self.n:
             # если пробежались по всем строкам
@@ -103,9 +122,7 @@ class Graph:
             self.line_token = self.table_token[self.i]
             self.m = len(self.line_token)
 
-        # number_title = 'stmt'
         token = self.next_token()
-
         if token.get("VAR") and self.m == 3:
             # инициализация переменных или присваивание
             self.add_in_graph_title_gram(title=token, number_title="stmt")
@@ -128,7 +145,6 @@ class Graph:
         elif token.get("VAR"):
             self.add_in_graph_title_gram(title=token, number_title="stmt")
             token = self.next_token()
-            # pprint(token)
 
             if token.get("AM"):
                 number_title = list(self.tops[-1].keys())[0]
@@ -136,7 +152,44 @@ class Graph:
                                              number_title=number_title)
                 self.uzel = list(self.tops[-1].keys())[0]
                 self.mathematic()
-                # token = self.next_token()
+
+        elif token.get("IF"):
+            self.add_in_graph_title_gram(title=token, number_title="stmt")
+            self.uzel = list(self.tops[-1].keys())[0]
+            token = self.next_token()
+            if token.get('FLOAT') or token.get('INT') or token.get('VAR') \
+                    or token.get("STR"):
+                number_title = list(self.tops[-1].keys())[0]
+                self.add_in_graph_title_gram(title=token,
+                                             number_title=number_title)
+                token = self.next_token()
+                if token.get('Equality') or token.get('MQ') or token.get('LQ') \
+                        or token.get("LESS") or token.get("MORE") \
+                        or token.get('NOTE'):
+                    number_title = list(self.tops[-1].keys())[0]
+                    self.add_in_graph_title_gram(title=token,
+                                                 number_title=number_title,
+                                                 list_=False)
+                    token = self.next_token()
+                    if token.get('FLOAT') or token.get('INT') or token.get(
+                            'VAR') or token.get("STR"):
+                        number_title = list(self.tops[-1].keys())[0]
+                        self.add_in_graph_title_gram(title=token,
+                                                     number_title=number_title,
+                                                     list_=True)
+                        self.condition()
+                    else:
+                        raise ValueError("В условии ожидалась переменная для "
+                                         "сравнения")
+                else:
+                    raise ValueError("В условии ожидался операнд сравнения")
+            else:
+                raise ValueError("В условии ожидалась переменная или число, "
+                                 "строка")
+        elif token.get("ELSE"):
+            self.add_in_graph_title_gram(title=token, number_title="stmt")
+            self.uzel = list(self.tops[-1].keys())[0]
+            self.condition()
 
         pprint(self.graph)
         # pprint(self.tops)
@@ -144,30 +197,156 @@ class Graph:
         # print(token)
         self.stmt()
 
+    def condition(self):
+        """Условие"""
+        if self.i >= self.n-1:
+            # если пробежались по всем строкам
+            return
+
+        if self.j >= self.m - 1:
+            # если текущий индекс столбца в строке токенов равен размеру
+            # длине строки
+            self.j = -1
+            self.i += 1
+            if len(self.open_brackets) != len(self.close_brackets):
+                raise ValueError("Не хватает закрывающей скобки")
+            elif len(self.open_braces) == len(self.close_braces):
+                return
+            elif self.i >= self.n-1:
+                return
+            self.line_token = self.table_token[self.i]
+            self.m = len(self.line_token)
+
+        token = self.next_token()
+        if token.get('OCB'):
+            self.add_in_graph_title_gram(title="cont",
+                                         number_title=self.uzel,
+                                         list_=False)
+            number_title = list(self.tops[-1].keys())[0]
+            self.open_braces.append({number_title: token})
+            self.add_in_graph_title_gram(title=token,
+                                         number_title=number_title,
+                                         list_=True)
+
+        elif token.get("VAR") and self.m == 3:
+            # инициализация переменных или присваивание
+            number_title = self.get_number_title()
+
+            self.add_in_graph_title_gram(title=token, number_title=number_title)
+            token = self.next_token()
+
+            if token.get("AM"):
+                number_title = list(self.tops[-1].keys())[0]
+                self.add_in_graph_title_gram(title=token,
+                                             number_title=number_title)
+                token = self.next_token()
+                if token.get('FLOAT') or token.get('INT') or token.get('VAR') \
+                        or token.get("STR"):
+                    number_title = list(self.tops[-1].keys())[0]
+                    self.add_in_graph_title_gram(title=token,
+                                                 number_title=number_title,
+                                                 list_=True)
+                else:
+                    raise ValueError("Ожидалась переменная или число, строка")
+        elif token.get("VAR"):
+            number_title = self.get_number_title()
+            self.add_in_graph_title_gram(title=token, number_title=number_title)
+            token = self.next_token()
+
+            if token.get("AM"):
+                number_title = list(self.tops[-1].keys())[0]
+                self.add_in_graph_title_gram(title=token,
+                                             number_title=number_title)
+                self.uzel = list(self.tops[-1].keys())[0]
+                self.mathematic()
+
+        elif token.get("IF"):
+            number_title = self.get_number_title()
+
+            self.add_in_graph_title_gram(title=token, number_title=number_title)
+            self.uzel = list(self.tops[-1].keys())[0]
+            token = self.next_token()
+
+            if token.get('FLOAT') or token.get('INT') or token.get('VAR') \
+                    or token.get("STR"):
+                number_title = list(self.tops[-1].keys())[0]
+                self.add_in_graph_title_gram(title=token,
+                                             number_title=number_title)
+                token = self.next_token()
+
+                if token.get('Equality') or token.get('MQ') or token.get('LQ') \
+                        or token.get("LESS") or token.get("MORE") \
+                        or token.get('NOTE'):
+                    number_title = list(self.tops[-1].keys())[0]
+                    self.add_in_graph_title_gram(title=token,
+                                                 number_title=number_title,
+                                                 list_=False)
+                    token = self.next_token()
+                    if token.get('FLOAT') or token.get('INT') or token.get(
+                            'VAR') or token.get("STR"):
+                        number_title = list(self.tops[-1].keys())[0]
+                        self.add_in_graph_title_gram(title=token,
+                                                     number_title=number_title,
+                                                     list_=True)
+                    else:
+                        raise ValueError("В условии ожидалась переменная для "
+                                         "сравнения")
+                else:
+                    raise ValueError("В условии ожидался операнд сравнения")
+            else:
+                raise ValueError("В условии ожидалась переменная или число, "
+                                 "строка")
+        elif token.get("ELSE"):
+            number_title = self.get_number_title()
+            self.add_in_graph_title_gram(title=token, number_title=number_title)
+            self.uzel = list(self.tops[-1].keys())[0]
+
+        elif token.get('CCB'):
+            number_title = self.get_number_title()
+            self.close_braces.append({number_title: token})
+            self.add_in_graph_title_gram(title=token,
+                                         number_title=number_title,
+                                         list_=True)
+            if len(self.open_braces) == len(self.close_braces):
+                self.close_braces.clear()
+                self.open_braces.clear()
+        self.condition()
+
     def mathematic(self):
+        """Математические операции"""
         if self.j >= self.m - 1:
             return
         token = self.next_token()
 
         if token.get('ADD') or token.get('MULT') \
                 or token.get("SUB") or token.get("DIV"):
-            number_title = list(self.tops[-1].keys())[0]
-            self.add_in_graph_title_gram(title=token,
-                                         number_title=number_title)
+            before_token = self.before_token()
+            if before_token.get('CB'):
+                # если до этого была закрывающая скобка графа
+                self.add_in_graph_title_gram(title=token,
+                                             number_title=self.uzel)
+            else:
+                number_title = list(self.tops[-1].keys())[0]
+                self.add_in_graph_title_gram(title=token,
+                                             number_title=number_title)
+
         elif token.get('OB'):
-            self.open_brackets.append({self.numbers_title + 1: token})
+            self.open_brackets.append({self.numbers_title: token})
             self.add_in_graph_title_gram(title="fact",
                                          number_title=self.uzel,
                                          list_=False)
+
             number_title = list(self.tops[-1].keys())[0]
             self.add_in_graph_title_gram(title=token,
                                          number_title=number_title,
                                          list_=True)
+
         elif token.get('FLOAT') or token.get('INT') or token.get('VAR'):
             number_title = list(self.tops[-1].keys())[0]
             self.add_in_graph_title_gram(title=token,
                                          number_title=number_title,
                                          list_=True)
+
         elif token.get('CB'):
             keys = 0
             for value in self.tops:
@@ -177,6 +356,10 @@ class Graph:
             self.add_in_graph_title_gram(title=token,
                                          number_title=keys,
                                          list_=True)
+        elif token.get('comment'):
+            self.add_in_graph_title_gram(title=token,
+                                         number_title=self.uzel,
+                                         list_=False)
         else:
             raise ValueError("Ожидалась переменная или матем. операнд")
         self.mathematic()

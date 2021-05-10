@@ -5,13 +5,13 @@ am -> expr | =
 
 Грамматика для ветвления
 stmt -> expr | var | if | e
-if ->  body | <условие> | скобка
+if ->  body | <cont> | скобка |
 else - > expr | for | var | if |e
 body - >  expr | var | if | e
 
 Грамматика для цикла for
 stmt -> expr | var | if | for |e
-for -> var |  <условие> | expr |body
+for -> var |  <cont> | expr |body
 body -> expr | var | if | for |e
 
 Грамматика для алгебры:
