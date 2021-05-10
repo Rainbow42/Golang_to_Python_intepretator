@@ -4,7 +4,7 @@ func main() {
     sum = 505.55
     a =  -12
     i := -1
-    answer = ( 12 + 3 - 9 * 6 ) / 7 //
+    answer = ( 12 + 3 - 9 * 6 ) / 7
      if i == 0 {
     }
     else {

@@ -33,7 +33,7 @@ class Graph:
     open_brackets = list()  # для отслеживания открытых скобок
     close_brackets = list()  # для отслеживания закрытых скобок
     open_braces = list()  # для отслеживания открытых фигурных скобок
-    close_braces = list()  # для отслеживания закрытых фигурных скобок
+    close_braces = dict()  # для отслеживания закрытых фигурных скобок
 
     # наименования выражения
 
@@ -91,10 +91,20 @@ class Graph:
 
     def get_number_title(self):
         number_title = None
-
-        for val in self.open_braces:  # для слежения за вложенностью
-            val = list(val.keys())[0]
-            for val2 in self.close_braces:
+        if len(self.close_braces) == 0:
+            for val in self.open_braces:  # для слежения за вложенностью
+                val = list(val.keys())[0]
+                if len(self.close_braces) == 0:
+                    number_title = val
+                else:
+                    if val not in self.close_braces:
+                        number_title = val
+        else:
+            for val in self.open_braces:  # для слежения за вложенностью
+                val = list(val.keys())[0]
+                if val not in self.close_braces:
+                    number_title = val
+            """for val2 in self.close_braces:
                 if val2:
                     val2 = list(val2.keys())[0]
                     if val != val2:
@@ -102,7 +112,7 @@ class Graph:
                 else:
                     number_title = val
             else:
-                number_title = val
+                number_title = val"""
         return number_title
 
     def stmt(self):
@@ -127,7 +137,7 @@ class Graph:
             # инициализация переменных или присваивание
             self.add_in_graph_title_gram(title=token, number_title="stmt")
             token = self.next_token()
-            # pprint(token)
+
             if token.get("AM"):
                 number_title = list(self.tops[-1].keys())[0]
                 self.add_in_graph_title_gram(title=token,
@@ -190,6 +200,12 @@ class Graph:
             self.add_in_graph_title_gram(title=token, number_title="stmt")
             self.uzel = list(self.tops[-1].keys())[0]
             self.condition()
+        elif token.get('CCB'):
+            number_title = self.get_number_title()
+            self.add_in_graph_title_gram(title=token,
+                                         number_title=number_title,
+                                         list_=True)
+
 
         pprint(self.graph)
         # pprint(self.tops)
@@ -211,6 +227,8 @@ class Graph:
             if len(self.open_brackets) != len(self.close_brackets):
                 raise ValueError("Не хватает закрывающей скобки")
             elif len(self.open_braces) == len(self.close_braces):
+                """self.open_braces.clear()
+                self.close_braces.clear()"""
                 return
             elif self.i >= self.n-1:
                 return
@@ -218,6 +236,7 @@ class Graph:
             self.m = len(self.line_token)
 
         token = self.next_token()
+
         if token.get('OCB'):
             self.add_in_graph_title_gram(title="cont",
                                          number_title=self.uzel,
@@ -303,13 +322,10 @@ class Graph:
 
         elif token.get('CCB'):
             number_title = self.get_number_title()
-            self.close_braces.append({number_title: token})
+            self.close_braces[number_title] = token
             self.add_in_graph_title_gram(title=token,
                                          number_title=number_title,
                                          list_=True)
-            if len(self.open_braces) == len(self.close_braces):
-                self.close_braces.clear()
-                self.open_braces.clear()
         self.condition()
 
     def mathematic(self):
