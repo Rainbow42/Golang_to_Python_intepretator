@@ -5,9 +5,8 @@ import re
 class Parsing:
     keywords = ('break', 'default', 'func', 'interface', 'select', 'main()',
                 'package', 'case', 'defer', 'go', 'map', 'struct', 'main',
-                'chan', 'goto', 'package', 'switch',
-                'const', 'fallthrough', 'range', 'type',
-                'continue', 'for', 'import', 'return', 'var', ';')
+                'chan', 'goto', 'package', 'switch', 'const', 'fallthrough',
+                'range', 'type', 'continue', 'import', 'return', 'var',)
 
     def parsing_lexeme(self, code):
         lexeme = LexicalDictionary()
@@ -27,6 +26,13 @@ class Parsing:
                 if key == "if":
                     lexeme.condition(key)
                     continue
+                if word := re.findall(r';$', key):
+                    lexeme.semicolon("".join(word))
+                    continue
+
+                if word := re.findall(r'for$', key):
+                    lexeme.foreach("".join(word))
+                    continue
 
                 if word := re.findall(r'else$', key):
                     lexeme.other("".join(word))
@@ -36,7 +42,7 @@ class Parsing:
                     lexeme.string(key)
                     continue
 
-                if word := re.findall(r'[-+]?[0-9]+', key):
+                if word := re.findall(r'[-+]?[0-9]$', key):
                     # целое число
                     lexeme.integer("".join(word))
 
@@ -167,6 +173,9 @@ class LexicalDictionary:
     def string(self, key: str):
         self.table_word.append({'STR': key})
 
+    def semicolon(self, key: str):
+        self.table_word.append({'SEM': key})
+
     def closing_curly_brace(self, key: str):
         self.table_word.append({'CCB': key})
 
@@ -184,6 +193,9 @@ class LexicalDictionary:
 
     def open_brace(self, key: str):
         self.table_word.append({'OB': key})
+
+    def foreach(self, key: str):
+        self.table_word.append({'FOREACH': key})
 
     def less_equally(self, key: str):
         self.table_word.append({'LQ': key})

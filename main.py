@@ -10,3 +10,10 @@ if __name__ == '__main__':
     # pprint(table_lexemes)
     graph = Graph(table_lexemes[2:]).stmt()
     # pprint(graph)
+    """if grade >= 65 {
+      if grade == 70 {
+       answer = ( 12 + 3 - 9 * 6 ) / 7
+      }
+      else {
+      }
+   }"""

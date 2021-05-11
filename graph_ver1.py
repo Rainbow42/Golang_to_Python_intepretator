@@ -196,16 +196,47 @@ class Graph:
             else:
                 raise ValueError("В условии ожидалась переменная или число, "
                                  "строка")
+
         elif token.get("ELSE"):
             self.add_in_graph_title_gram(title=token, number_title="stmt")
             self.uzel = list(self.tops[-1].keys())[0]
             self.condition()
+
+        elif token.get("FOREACH"):
+            self.add_in_graph_title_gram(title=token, number_title="stmt")
+            number_title = list(self.tops[-1].keys())[0]
+            self.add_in_graph_title_gram(title="cont",
+                                         number_title=number_title,
+                                         list_=False)
+            self.uzel = list(self.tops[-1].keys())[0]
+            token = self.next_token()
+            if token.get('VAR'):
+                self.add_in_graph_title_gram(title=token,
+                                             number_title=self.uzel)
+                token = self.next_token()
+                if token.get("AM"):
+                    number_title = list(self.tops[-1].keys())[0]
+                    self.add_in_graph_title_gram(title=token,
+                                                 number_title=number_title)
+                    token = self.next_token()
+                    if token.get('FLOAT') or token.get('INT') or token.get('VAR'):
+                        number_title = list(self.tops[-1].keys())[0]
+                        self.add_in_graph_title_gram(title=token,
+                                                     number_title=number_title)
+                        token = self.next_token()
+                        if token.get('SEM'):
+                            number_title = list(self.tops[-1].keys())[0]
+                            self.add_in_graph_title_gram(title=token,
+                                                         number_title=number_title,
+                                                         list_=True)
+                            self.foreach()
+            # self.condition()
+
         elif token.get('CCB'):
             number_title = self.get_number_title()
             self.add_in_graph_title_gram(title=token,
                                          number_title=number_title,
                                          list_=True)
-
 
         pprint(self.graph)
         # pprint(self.tops)
@@ -213,9 +244,8 @@ class Graph:
         # print(token)
         self.stmt()
 
-    def condition(self):
-        """Условие"""
-        if self.i >= self.n-1:
+    def foreach(self):
+        if self.i >= self.n - 1:
             # если пробежались по всем строкам
             return
 
@@ -230,7 +260,79 @@ class Graph:
                 """self.open_braces.clear()
                 self.close_braces.clear()"""
                 return
-            elif self.i >= self.n-1:
+            elif self.i >= self.n - 1:
+                return
+            self.line_token = self.table_token[self.i]
+            self.m = len(self.line_token)
+
+        token = self.next_token()
+        if token.get('FLOAT') or token.get('INT') or token.get('VAR'):
+            self.add_in_graph_title_gram(title=token,
+                                         number_title=self.uzel)
+            token = self.next_token()
+            if token.get("AM"):
+                number_title = list(self.tops[-1].keys())[0]
+                self.add_in_graph_title_gram(title=token,
+                                             number_title=number_title)
+                token = self.next_token()
+                if token.get('FLOAT') or token.get('INT') or token.get('VAR'):
+                    number_title = list(self.tops[-1].keys())[0]
+                    self.add_in_graph_title_gram(title=token,
+                                                 number_title=number_title)
+                    token = self.next_token()
+                    if token.get('SEM'):
+                        number_title = list(self.tops[-1].keys())[0]
+                        self.add_in_graph_title_gram(title=token,
+                                                     number_title=number_title)
+            token = self.next_token()
+            if token.get('FLOAT') or token.get('INT') or token.get('VAR'):
+                self.add_in_graph_title_gram(title=token,
+                                             number_title=self.uzel)
+                token = self.next_token()
+                if token.get('MQ') or token.get('LQ') or token.get("LESS") or \
+                    token.get("MORE") or token.get('NOTE'):
+                    number_title = list(self.tops[-1].keys())[0]
+                    self.add_in_graph_title_gram(title=token,
+                                                 number_title=number_title)
+                    token = self.next_token()
+                    if token.get('FLOAT') or token.get('INT') or token.get(
+                            'VAR'):
+                        number_title = list(self.tops[-1].keys())[0]
+                        self.add_in_graph_title_gram(title=token,
+                                                     number_title=number_title)
+                        token = self.next_token()
+                        if token.get('SEM'):
+                            number_title = list(self.tops[-1].keys())[0]
+                            self.add_in_graph_title_gram(title=token,
+                                                         number_title=number_title)
+                token = self.next_token()
+                if token.get('VAR'):
+                    self.add_in_graph_title_gram(title=token,
+                                                 number_title=self.uzel)
+                    token = self.next_token()
+                    if token.get('ADD') or token.get('SUB'):
+                        number_title = list(self.tops[-1].keys())[0]
+                        self.add_in_graph_title_gram(title=token,
+                                                     number_title=number_title)
+
+    def condition(self):
+        """Условие"""
+        if self.i >= self.n - 1:
+            # если пробежались по всем строкам
+            return
+
+        if self.j >= self.m - 1:
+            # если текущий индекс столбца в строке токенов равен размеру
+            # длине строки
+            self.j = -1
+            self.i += 1
+            if len(self.open_brackets) != len(self.close_brackets):
+                raise ValueError("Не хватает закрывающей скобки")
+            elif len(self.open_braces) == len(self.close_braces):
+                """self.open_braces.clear()
+                self.close_braces.clear()"""
+                return
+            elif self.i >= self.n - 1:
                 return
             self.line_token = self.table_token[self.i]
             self.m = len(self.line_token)
