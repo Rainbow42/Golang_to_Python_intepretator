@@ -5,7 +5,7 @@ func main() {
     a =  -12
     i := -1
     answer = ( 12 + 3 - 9 * 6 ) / 7
-     if i == 0 {
+    if i == 0 {
     }
     else {
     }
@@ -16,7 +16,7 @@ func main() {
     for j := 7; j != 9; j++ {
       sum = sum + 1
     }
-    if > 0 {
+    if sum > 0 {
         break
     }
 }

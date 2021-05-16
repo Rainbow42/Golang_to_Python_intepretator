@@ -1,6 +1,6 @@
 from pprint import pprint
 
-from graph_ver1 import Graph
+from graph import Graph
 from parsing import get_file, Parsing, Table
 
 if __name__ == '__main__':
@@ -8,12 +8,9 @@ if __name__ == '__main__':
     lexemes = Parsing().parsing_lexeme(code)
     table_lexemes = Table().get_table()
     # pprint(table_lexemes)
-    graph = Graph(table_lexemes[2:]).stmt()
+    graph = Graph(table_lexemes[2:])
+    graph.stmt()
+    print(graph.get_variable_table())
+    #graph = graph.get_abstract_syntax_trees()
     # pprint(graph)
-    """if grade >= 65 {
-      if grade == 70 {
-       answer = ( 12 + 3 - 9 * 6 ) / 7
-      }
-      else {
-      }
-   }"""
+    # RecursiveDescent(graph).output()
