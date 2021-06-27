@@ -1,0 +1,31 @@
+Грамматика для объявления переменных:
+stmt -> expr | var | if | e
+var - > am(=) | num
+am -> expr | =
+
+Грамматика для ветвления
+stmt -> expr | var | if | e
+if ->  body | <cont> | скобка |
+else - > expr | for | var | if |e
+body - >  expr | var | if | e
+
+Грамматика для цикла for
+stmt -> expr | var | if | for |e
+for -> var |  <cont> | expr |body
+body -> expr | var | if | for |e
+
+Грамматика для алгебры:
+stmt -> expr | var | if | e
+expr -> term | term + expr | term ++ | term -- | term - expr
+term -> fact | fact * term | fact / term
+fact - > num | (expr)
+
+Граф:
+graph = {"stmt": [{0: "expr"}, ],
+        "0": [1:"term"],
+        "1": ["{"2":"fact"}", "*", {3: "term"}],
+        "3": [{4: "fact"}],
+        "4": ["LP", "5:expr"],
+        "5": [{6: "term"}],
+        "2": ["Num"]
+        }
